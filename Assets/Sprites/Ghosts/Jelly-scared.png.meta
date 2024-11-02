@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Jelly-scared_0: -1621210827088418657
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

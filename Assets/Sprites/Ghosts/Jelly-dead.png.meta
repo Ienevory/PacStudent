@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Jelly-dead_0: 2270393804125570913
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

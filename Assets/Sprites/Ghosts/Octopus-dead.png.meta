@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Octopus-dead_0: 3201552275912494942
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

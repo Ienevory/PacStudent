@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Fish-scared_0: -5631685157945168111
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

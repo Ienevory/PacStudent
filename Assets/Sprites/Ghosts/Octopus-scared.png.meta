@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Octopus-scared_0: 159778281950772278
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

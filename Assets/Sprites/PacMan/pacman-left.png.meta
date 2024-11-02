@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      pacman-left_0: 7391214557502215734
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

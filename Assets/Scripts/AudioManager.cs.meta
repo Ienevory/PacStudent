@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: e8caad8edbebbc34ba6659deaeebae16
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - introMusic: {fileID: 8300000, guid: 74c4204a83289ec438cc041c71644614, type: 3}
+  - normalStateMusic: {fileID: 8300000, guid: 3c8362f189e740046a454f5d5ca632cf, type: 3}
+  - scaredStateMusic: {fileID: 8300000, guid: 3cdbc7439e64f5547b61cb4ffa95b85b, type: 3}
+  - deadStateMusic: {instanceID: 0}
+  - pelletCollection: {fileID: 8300000, guid: d45df06f135f4f24f8bfe45c59f508dc, type: 3}
+  - powerPelletCollection: {fileID: 8300000, guid: f95d9b817f58d204e8baa9d0ea28ec13, type: 3}
+  - pacStudentMovement: {fileID: 8300000, guid: 45a5d2386bfe83b4fa76abd332ab57e4, type: 3}
+  - wallCollision: {instanceID: 0}
+  - pacStudentDeath: {fileID: 8300000, guid: 617a44fc1991f8944802d186a600b4b8, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
