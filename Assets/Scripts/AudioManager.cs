@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AudioManager : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class AudioManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return; // Exit if duplicate instance
         }
 
         // Set up audio sources
@@ -40,7 +42,17 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        PlayMusic(introMusic);
+        // Play the appropriate background music based on the current scene
+        string currentScene = SceneManager.GetActiveScene().name;
+        
+        if (currentScene == "StartScene")
+        {
+            PlayMusic(introMusic);
+        }
+        else if (currentScene == "SampleScene")
+        {
+            PlayMusic(normalStateMusic);
+        }
     }
 
     // Function to play background music
