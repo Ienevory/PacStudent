@@ -58,17 +58,28 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(clip);
     }
 
-    // Functions to switch between different music states
-    public void PlayNormalStateMusic() => PlayMusic(normalStateMusic);
+    // Play and stop specific sound effects for movement
+    public void PlayPacStudentMovementSFX()
+    {
+        if (!sfxSource.isPlaying)
+        {
+            sfxSource.clip = pacStudentMovement;
+            sfxSource.loop = true;
+            sfxSource.Play();
+        }
+    }
 
-    public void PlayScaredStateMusic() => PlayMusic(scaredStateMusic);
+    public void StopPacStudentMovementSFX()
+    {
+        if (sfxSource.clip == pacStudentMovement)
+        {
+            sfxSource.Stop();
+            sfxSource.loop = false;
+        }
+    }
 
-    // Functions to play specific sound effects
+    // Additional SFX functions for other actions
     public void PlayPelletCollectionSFX() => PlaySFX(pelletCollection);
-
     public void PlayPowerPelletCollectionSFX() => PlaySFX(powerPelletCollection);
-
-    public void PlayPacStudentMovementSFX() => PlaySFX(pacStudentMovement);
-
     public void PlayPacStudentDeathSFX() => PlaySFX(pacStudentDeath);
 }
