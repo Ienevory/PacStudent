@@ -3,15 +3,15 @@ using UnityEngine;
 public class PacStudentMovement : MonoBehaviour
 {
     public float moveSpeed = 2f;
-    public ParticleSystem dustEffect; // Assign this in Inspector
+    public ParticleSystem dustEffect;
     private Animator animator;
     private Vector2 currentDirection = Vector2.zero;
-    private AudioManager audioManager;
+    private Vector2 lastValidPosition;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
-        audioManager = AudioManager.instance;
+        lastValidPosition = transform.position;
     }
 
     private void Update()
@@ -22,11 +22,10 @@ public class PacStudentMovement : MonoBehaviour
 
     private void HandleInput()
     {
-        // Get raw input for direct movement without grid snapping
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        // Prioritize horizontal movement if both directions are pressed
+        // Set direction based on input, prioritizing horizontal movement
         if (horizontal != 0)
         {
             currentDirection = new Vector2(horizontal, 0).normalized;
@@ -37,28 +36,25 @@ public class PacStudentMovement : MonoBehaviour
         }
         else
         {
-            currentDirection = Vector2.zero; // Stop if no input
+            currentDirection = Vector2.zero;
         }
     }
 
     private void MovePacStudent()
+{
+    if (currentDirection != Vector2.zero)
     {
-        // Only move if there is a direction set
-        if (currentDirection != Vector2.zero)
-        {
-            // Move PacStudent
-            transform.Translate(currentDirection * moveSpeed * Time.deltaTime);
+        // Perform a Raycast to check for walls in the direction of movement
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, currentDirection, 0.1f);
 
-            // Trigger movement animations based on direction
+        if (hit.collider == null || !hit.collider.CompareTag("Wall"))
+        {
+            // Move only if there is no wall in the desired direction
+            Vector2 targetPosition = (Vector2)transform.position + currentDirection * moveSpeed * Time.deltaTime;
+            transform.position = targetPosition;
+            lastValidPosition = transform.position; // Update last valid position
             UpdateAnimation();
 
-            // Play movement sound
-            if (audioManager != null)
-            {
-                audioManager.PlayPacStudentMovementSFX();
-            }
-
-            // Play dust effect if not already playing
             if (!dustEffect.isPlaying)
             {
                 dustEffect.Play();
@@ -66,38 +62,54 @@ public class PacStudentMovement : MonoBehaviour
         }
         else
         {
-            // Stop movement sound and dust effect when idle
-            if (audioManager != null)
-            {
-                audioManager.StopPacStudentMovementSFX();
-            }
+            // Reset to the last valid position when a wall is encountered
+            transform.position = lastValidPosition;
+            currentDirection = Vector2.zero; // Stop movement
             dustEffect.Stop();
         }
     }
+    else
+    {
+        dustEffect.Stop();
+    }
+}
+
 
     private void UpdateAnimation()
     {
-        // Reset all triggers before setting a new one
+        // Reset all triggers and set the appropriate one
         animator.ResetTrigger("WalkRight");
         animator.ResetTrigger("WalkLeft");
         animator.ResetTrigger("WalkUp");
         animator.ResetTrigger("WalkDown");
 
         if (currentDirection == Vector2.right)
-        {
             animator.SetTrigger("WalkRight");
-        }
         else if (currentDirection == Vector2.left)
-        {
             animator.SetTrigger("WalkLeft");
-        }
         else if (currentDirection == Vector2.up)
-        {
             animator.SetTrigger("WalkUp");
-        }
         else if (currentDirection == Vector2.down)
-        {
             animator.SetTrigger("WalkDown");
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Pellet"))
+        {
+            Destroy(collision.gameObject);
+            GameManager.instance.AddScore(10);
+        }
+        else if (collision.gameObject.CompareTag("PowerPellet"))
+        {
+            Destroy(collision.gameObject);
+            GameManager.instance.StartScaredState();
+            GameManager.instance.AddScore(50);
+        }
+        else if (collision.gameObject.CompareTag("Cherry"))
+        {
+            Destroy(collision.gameObject);
+            GameManager.instance.AddScore(100);
         }
     }
 }
