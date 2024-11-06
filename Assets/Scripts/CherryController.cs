@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CherryController : MonoBehaviour
 {
-    public GameObject cherryPrefab; // Assign your Cherry prefab here
+    public GameObject cherryPrefab; 
     private float spawnInterval = 10f;
 
     private void Start()
@@ -17,11 +17,9 @@ public class CherryController : MonoBehaviour
         {
             yield return new WaitForSeconds(spawnInterval);
 
-            // Spawn off-screen at random position
             Vector2 spawnPosition = new Vector2(Random.Range(-10, 10), Random.Range(-10, 10));
             GameObject cherry = Instantiate(cherryPrefab, spawnPosition, Quaternion.identity);
 
-            // Move cherry across the screen
             StartCoroutine(MoveCherry(cherry));
         }
     }
@@ -39,7 +37,6 @@ public class CherryController : MonoBehaviour
             yield return null;
         }
 
-        // Destroy cherry if it wasn’t collected
         Destroy(cherry);
     }
 }

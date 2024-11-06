@@ -21,7 +21,6 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        // Ensure singleton instance
         if (instance == null)
         {
             instance = this;
@@ -30,19 +29,17 @@ public class AudioManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
-            return; // Exit if duplicate instance
+            return; 
         }
 
-        // Set up audio sources
         musicSource = gameObject.AddComponent<AudioSource>();
         sfxSource = gameObject.AddComponent<AudioSource>();
 
-        musicSource.loop = true; // Background music loops by default
+        musicSource.loop = true; 
     }
 
     private void Start()
     {
-        // Play the appropriate background music based on the current scene
         string currentScene = SceneManager.GetActiveScene().name;
         
         if (currentScene == "StartScene")
@@ -55,22 +52,19 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // Function to play background music
     public void PlayMusic(AudioClip clip)
     {
-        if (musicSource.clip == clip) return; // Skip if same music is already playing
+        if (musicSource.clip == clip) return; 
 
         musicSource.clip = clip;
         musicSource.Play();
     }
 
-    // Function to play sound effects
     public void PlaySFX(AudioClip clip)
     {
         sfxSource.PlayOneShot(clip);
     }
 
-    // Play and stop specific sound effects for movement
     public void PlayPacStudentMovementSFX()
     {
         if (!sfxSource.isPlaying)
@@ -90,7 +84,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // Additional SFX functions for other actions
     public void PlayPelletCollectionSFX() => PlaySFX(pelletCollection);
     public void PlayPowerPelletCollectionSFX() => PlaySFX(powerPelletCollection);
     public void PlayPacStudentDeathSFX() => PlaySFX(pacStudentDeath);

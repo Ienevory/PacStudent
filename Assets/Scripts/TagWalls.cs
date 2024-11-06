@@ -4,7 +4,6 @@ public class TagWalls : MonoBehaviour
 {
     void Start()
     {
-        // Find all GameObjects in the scene with "Wall" in their name
         GameObject[] walls = GameObject.FindGameObjectsWithTag("Untagged");
 
         foreach (GameObject wall in walls)
@@ -15,7 +14,6 @@ public class TagWalls : MonoBehaviour
             }
         }
 
-        // Remove this script from the GameObject after tagging
         Destroy(this);
     }
 }

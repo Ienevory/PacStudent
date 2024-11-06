@@ -5,11 +5,14 @@ TagManager:
   serializedVersion: 2
   tags:
   - Wall
+  - Cherry
+  - Pellet
+  - PowerPellet
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - WallLayer
   - Water
   - UI
   - 

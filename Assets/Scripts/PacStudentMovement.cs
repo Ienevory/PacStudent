@@ -2,21 +2,32 @@ using UnityEngine;
 
 public class PacStudentMovement : MonoBehaviour
 {
-    public float moveSpeed = 2f;
-    public ParticleSystem dustEffect;
+    public float moveSpeed = 5f;
+    private Vector2 destination;
+    private bool isMoving = false;
     private Animator animator;
-    private Vector2 currentDirection = Vector2.zero;
-    private Vector2 lastValidPosition;
+
+    private Rigidbody2D rb;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
-        lastValidPosition = transform.position;
+        destination = transform.position;
+
+        // Get the Rigidbody2D component
+        rb = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
     {
-        HandleInput();
+        if (!isMoving)
+        {
+            HandleInput();
+        }
+    }
+
+    private void FixedUpdate()
+    {
         MovePacStudent();
     }
 
@@ -25,91 +36,137 @@ public class PacStudentMovement : MonoBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        // Set direction based on input, prioritizing horizontal movement
+        Vector2 direction = Vector2.zero;
+
         if (horizontal != 0)
         {
-            currentDirection = new Vector2(horizontal, 0).normalized;
+            direction = new Vector2(horizontal, 0);
         }
         else if (vertical != 0)
         {
-            currentDirection = new Vector2(0, vertical).normalized;
+            direction = new Vector2(0, vertical);
         }
-        else
+
+        if (direction != Vector2.zero)
         {
-            currentDirection = Vector2.zero;
+            // Check for wall in the direction
+            float raycastDistance = 1f;
+            int wallLayerMask = LayerMask.GetMask("WallLayer");
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, raycastDistance, wallLayerMask);
+
+            // Debugging: Visualize the raycast in the Scene view
+            Debug.DrawRay(transform.position, direction * raycastDistance, Color.red, 0.1f);
+
+            if (hit.collider == null)
+            {
+                destination = (Vector2)transform.position + direction;
+                isMoving = true;
+                UpdateAnimation(direction);
+
+                // Play movement audio
+                AudioManager.instance.PlayPacStudentMovementSFX();
+
+                // Play dust particle effect
+                // Uncomment the following lines if you have set up the particle system
+                // if (!dustEffect.isPlaying)
+                // {
+                //     dustEffect.Play();
+                // }
+            }
+            else
+            {
+                // Wall in the way - do not move
+                UpdateAnimation(Vector2.zero);
+
+                // Optionally, play a wall collision sound or effect
+                // AudioManager.instance.PlayWallCollisionSFX();
+
+                // Stop movement audio
+                AudioManager.instance.StopPacStudentMovementSFX();
+
+                // Stop dust particle effect
+                // Uncomment the following line if you have set up the particle system
+                // dustEffect.Stop();
+            }
         }
     }
 
     private void MovePacStudent()
-{
-    if (currentDirection != Vector2.zero)
     {
-        // Perform a Raycast to check for walls in the direction of movement
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, currentDirection, 0.1f);
-
-        if (hit.collider == null || !hit.collider.CompareTag("Wall"))
+        if (isMoving)
         {
-            // Move only if there is no wall in the desired direction
-            Vector2 targetPosition = (Vector2)transform.position + currentDirection * moveSpeed * Time.deltaTime;
-            transform.position = targetPosition;
-            lastValidPosition = transform.position; // Update last valid position
-            UpdateAnimation();
+            float step = moveSpeed * Time.fixedDeltaTime;
+            Vector2 newPosition = Vector2.MoveTowards(rb.position, destination, step);
+            rb.MovePosition(newPosition);
 
-            if (!dustEffect.isPlaying)
+            if (Vector2.Distance(rb.position, destination) < 0.001f)
             {
-                dustEffect.Play();
+                rb.position = destination;
+                isMoving = false;
+
+                // Stop movement audio when movement completes
+                AudioManager.instance.StopPacStudentMovementSFX();
+
+                // Stop dust particle effect
+                // Uncomment the following line if you have set up the particle system
+                // dustEffect.Stop();
             }
         }
-        else
-        {
-            // Reset to the last valid position when a wall is encountered
-            transform.position = lastValidPosition;
-            currentDirection = Vector2.zero; // Stop movement
-            dustEffect.Stop();
-        }
     }
-    else
+
+    private void UpdateAnimation(Vector2 direction)
     {
-        dustEffect.Stop();
-    }
-}
-
-
-    private void UpdateAnimation()
-    {
-        // Reset all triggers and set the appropriate one
-        animator.ResetTrigger("WalkRight");
-        animator.ResetTrigger("WalkLeft");
-        animator.ResetTrigger("WalkUp");
-        animator.ResetTrigger("WalkDown");
-
-        if (currentDirection == Vector2.right)
-            animator.SetTrigger("WalkRight");
-        else if (currentDirection == Vector2.left)
-            animator.SetTrigger("WalkLeft");
-        else if (currentDirection == Vector2.up)
-            animator.SetTrigger("WalkUp");
-        else if (currentDirection == Vector2.down)
-            animator.SetTrigger("WalkDown");
+        animator.SetFloat("MoveX", direction.x);
+        animator.SetFloat("MoveY", direction.y);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("WallLayer"))
+        {
+            // Collision with wall
+            isMoving = false;
+            destination = transform.position;
+            UpdateAnimation(Vector2.zero);
+
+            // Play wall collision sound
+            // AudioManager.instance.PlayWallCollisionSFX();
+
+            // Stop movement audio
+            AudioManager.instance.StopPacStudentMovementSFX();
+
+            // Stop dust particle effect
+            // Uncomment the following line if you have set up the particle system
+            // dustEffect.Stop();
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Pellet"))
         {
             Destroy(collision.gameObject);
             GameManager.instance.AddScore(10);
+
+            // Play pellet collection sound
+            AudioManager.instance.PlayPelletCollectionSFX();
         }
         else if (collision.gameObject.CompareTag("PowerPellet"))
         {
             Destroy(collision.gameObject);
             GameManager.instance.StartScaredState();
             GameManager.instance.AddScore(50);
+
+            // Play power pellet collection sound
+            AudioManager.instance.PlayPowerPelletCollectionSFX();
         }
         else if (collision.gameObject.CompareTag("Cherry"))
         {
             Destroy(collision.gameObject);
             GameManager.instance.AddScore(100);
+
+            // Play cherry collection sound (if you have one)
+            // AudioManager.instance.PlayCherryCollectionSFX();
         }
     }
 }

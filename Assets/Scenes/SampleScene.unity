@@ -528,7 +528,7 @@ GameObject:
   - component: {fileID: 270369189}
   - component: {fileID: 270369190}
   - component: {fileID: 270369191}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Horizontal Line Inside
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -1451,7 +1451,7 @@ GameObject:
   - component: {fileID: 539800144}
   - component: {fileID: 539800145}
   - component: {fileID: 539800146}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: T Block
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -7159,7 +7159,7 @@ GameObject:
   - component: {fileID: 781392393}
   - component: {fileID: 781392394}
   - component: {fileID: 781392395}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Outside Corner
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -7412,7 +7412,7 @@ GameObject:
   - component: {fileID: 954642124}
   m_Layer: 0
   m_Name: Pellet
-  m_TagString: Untagged
+  m_TagString: Pellet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7516,7 +7516,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -7963,9 +7963,10 @@ GameObject:
   - component: {fileID: 1253187441}
   - component: {fileID: 1253187443}
   - component: {fileID: 1253187444}
+  - component: {fileID: 1253187445}
   m_Layer: 0
   m_Name: PacStudent Game Object
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8075,7 +8076,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 1.5
-  dustEffect: {fileID: 677121643}
 --- !u!58 &1253187444
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -8112,6 +8112,33 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0.008623865, y: 0}
   m_Radius: 0.16862386
+--- !u!50 &1253187445
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1253187439}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!1 &1274702355
 GameObject:
   m_ObjectHideFlags: 0
@@ -8385,7 +8412,7 @@ GameObject:
   - component: {fileID: 1427862866}
   m_Layer: 0
   m_Name: Power Pellet
-  m_TagString: Untagged
+  m_TagString: PowerPellet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8489,7 +8516,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -8516,7 +8543,7 @@ GameObject:
   - component: {fileID: 1432809358}
   - component: {fileID: 1432809359}
   - component: {fileID: 1432809360}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Horizontal Line Outside
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -8689,7 +8716,7 @@ GameObject:
   - component: {fileID: 1492878014}
   - component: {fileID: 1492878015}
   - component: {fileID: 1492878016}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Inside Corner
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -11110,6 +11137,10 @@ PrefabInstance:
     - target: {fileID: 463627462786458830, guid: 59ab104a08850a94fa293f17847ab5fc, type: 3}
       propertyPath: m_Name
       value: Bonus Item
+      objectReference: {fileID: 0}
+    - target: {fileID: 463627462786458830, guid: 59ab104a08850a94fa293f17847ab5fc, type: 3}
+      propertyPath: m_TagString
+      value: Cherry
       objectReference: {fileID: 0}
     - target: {fileID: 6285628159634695946, guid: 59ab104a08850a94fa293f17847ab5fc, type: 3}
       propertyPath: m_LocalPosition.x
