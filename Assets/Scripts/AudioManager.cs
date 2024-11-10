@@ -15,6 +15,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip powerPelletCollection;
     public AudioClip pacStudentMovement;
     public AudioClip pacStudentDeath;
+    // **Added cherry collection sound clip**
+    public AudioClip cherryCollection; // Add this line
 
     private AudioSource musicSource;
     private AudioSource sfxSource;
@@ -29,19 +31,19 @@ public class AudioManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
-            return; 
+            return;
         }
 
         musicSource = gameObject.AddComponent<AudioSource>();
         sfxSource = gameObject.AddComponent<AudioSource>();
 
-        musicSource.loop = true; 
+        musicSource.loop = true;
     }
 
     private void Start()
     {
         string currentScene = SceneManager.GetActiveScene().name;
-        
+
         if (currentScene == "StartScene")
         {
             PlayMusic(introMusic);
@@ -54,7 +56,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayMusic(AudioClip clip)
     {
-        if (musicSource.clip == clip) return; 
+        if (musicSource.clip == clip) return;
 
         musicSource.clip = clip;
         musicSource.Play();
@@ -87,4 +89,6 @@ public class AudioManager : MonoBehaviour
     public void PlayPelletCollectionSFX() => PlaySFX(pelletCollection);
     public void PlayPowerPelletCollectionSFX() => PlaySFX(powerPelletCollection);
     public void PlayPacStudentDeathSFX() => PlaySFX(pacStudentDeath);
+    // **Added method to play cherry collection sound**
+    public void PlayCherryCollectionSFX() => PlaySFX(cherryCollection); // Add this line
 }
