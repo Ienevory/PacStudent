@@ -15,10 +15,10 @@ public class PacStudentMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         destination = transform.position;
 
-        // Get the Rigidbody2D component
+        // Gets the Rigidbody2D component
         rb = GetComponent<Rigidbody2D>();
 
-        // Get the ParticleSystem component
+        // Gets the ParticleSystem component
         dustEffect = GetComponentInChildren<ParticleSystem>();
 
         // Debug statement to confirm Start() is called
@@ -56,12 +56,11 @@ public class PacStudentMovement : MonoBehaviour
 
         if (direction != Vector2.zero)
         {
-            // Check for wall in the direction
+            // Checks for wall in the direction
             float raycastDistance = 1f;
             int wallLayerMask = LayerMask.GetMask("WallLayer");
             RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, raycastDistance, wallLayerMask);
 
-            // Debugging: Visualize the raycast in the Scene view
             Debug.DrawRay(transform.position, direction * raycastDistance, Color.red, 0.1f);
 
             if (hit.collider == null)
@@ -70,33 +69,30 @@ public class PacStudentMovement : MonoBehaviour
                 isMoving = true;
                 UpdateAnimation(direction);
 
-                // Play movement audio
+                // Plays movement audio
                 AudioManager.instance.PlayPacStudentMovementSFX();
 
-                // Play dust particle effect
+                // Plays dust particle effect
                 if (!dustEffect.isPlaying)
                 {
                     dustEffect.Play();
                 }
 
-                // Debug statement
                 Debug.Log("PacStudent started moving to " + destination);
             }
             else
             {
-                // Wall in the way - do not move
                 UpdateAnimation(Vector2.zero);
 
-                // Stop movement audio
+                // Stops movement audio
                 AudioManager.instance.StopPacStudentMovementSFX();
 
-                // Stop dust particle effect
+                // Stops dust particle effect
                 if (dustEffect.isPlaying)
                 {
                     dustEffect.Stop();
                 }
 
-                // Debug statement
                 Debug.Log("PacStudent can't move, wall detected at direction " + direction);
             }
         }
@@ -115,16 +111,15 @@ public class PacStudentMovement : MonoBehaviour
                 rb.position = destination;
                 isMoving = false;
 
-                // Stop movement audio when movement completes
+                // Stops movement audio when movement completes
                 AudioManager.instance.StopPacStudentMovementSFX();
 
-                // Stop dust particle effect
+                // Stops dust particle effect
                 if (dustEffect.isPlaying)
                 {
                     dustEffect.Stop();
                 }
 
-                // Debug statement
                 Debug.Log("PacStudent reached destination " + destination);
             }
         }
@@ -135,7 +130,6 @@ public class PacStudentMovement : MonoBehaviour
         animator.SetFloat("MoveX", direction.x);
         animator.SetFloat("MoveY", direction.y);
 
-        // Debug statement
         Debug.Log("PacStudent animation updated with direction " + direction);
     }
 
@@ -145,39 +139,38 @@ public class PacStudentMovement : MonoBehaviour
 
         if (collision.gameObject.layer == LayerMask.NameToLayer("WallLayer"))
         {
-            // Collision with wall
             isMoving = false;
             destination = transform.position;
             UpdateAnimation(Vector2.zero);
 
-            // Stop movement audio
+            // Stops movement audio
             AudioManager.instance.StopPacStudentMovementSFX();
 
-            // Stop dust particle effect
+            // Stops dust particle effect
             if (dustEffect.isPlaying)
             {
                 dustEffect.Stop();
             }
 
-            // Debug statement
+            // Why are you ignoring walls?
             Debug.Log("PacStudent collided with wall and stopped.");
         }
         else if (collision.gameObject.CompareTag("Ghost"))
         {
-            // Handle collision with Ghost
+            // Handles collision with Ghost
             GhostMovement ghostMovement = collision.gameObject.GetComponent<GhostMovement>();
             if (ghostMovement != null)
             {
                 if (ghostMovement.currentState == GhostState.Normal)
                 {
-                    // PacStudent loses a life
+                    // Damage
                     Debug.Log("PacStudent caught by a ghost!");
                     GameManager.instance.PacStudentCaught();
 
-                    // Play PacStudent death sound
+                    // Plays PacStudent death sound
                     AudioManager.instance.PlayPacStudentDeathSFX();
 
-                    // Implement death animation or life deduction logic here
+                    // Space for further death animation or smthn like this
                 }
                 else if (ghostMovement.currentState == GhostState.Scared)
                 {
@@ -186,8 +179,6 @@ public class PacStudentMovement : MonoBehaviour
                     ghostMovement.SetState(GhostState.Dead);
                     GameManager.instance.AddScore(200);
 
-                    // Play ghost eaten sound if you have one
-                    // AudioManager.instance.PlayGhostEatenSFX();
                 }
             }
         }
@@ -199,7 +190,7 @@ public class PacStudentMovement : MonoBehaviour
             Destroy(collision.gameObject);
             GameManager.instance.AddScore(100);
 
-            // Play cherry collection sound
+            // Plays cherry collection sound
             AudioManager.instance.PlayCherryCollectionSFX();
         }
     }
@@ -214,17 +205,24 @@ public class PacStudentMovement : MonoBehaviour
             Destroy(collision.gameObject);
             GameManager.instance.AddScore(10);
 
-            // Play pellet collection sound
+            // Plays pellet collection sound
             AudioManager.instance.PlayPelletCollectionSFX();
         }
         else if (collision.gameObject.CompareTag("PowerPellet"))
         {
             Debug.Log("Collected Power Pellet");
+            Collider2D pelletCollider = collision.gameObject.GetComponent<Collider2D>();
+            if (pelletCollider != null)
+            {
+                pelletCollider.enabled = false;
+                Debug.Log("Power Pellet collider disabled to prevent multiple triggers.");
+            }
+
             Destroy(collision.gameObject);
             GameManager.instance.AddScore(50);
             GameManager.instance.StartScaredState();
 
-            // Play power pellet collection sound
+            // Plays power pellet collection sound
             AudioManager.instance.PlayPowerPelletCollectionSFX();
         }
         else if (collision.gameObject.CompareTag("Cherry"))
@@ -233,7 +231,7 @@ public class PacStudentMovement : MonoBehaviour
             Destroy(collision.gameObject);
             GameManager.instance.AddScore(100);
 
-            // Play cherry collection sound
+            // Plays cherry collection sound
             AudioManager.instance.PlayCherryCollectionSFX();
         }
         else

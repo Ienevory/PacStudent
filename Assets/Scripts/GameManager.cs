@@ -9,10 +9,10 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     [Header("UI Elements")]
-    public TextMeshProUGUI countdownText;
-    public TextMeshProUGUI gameTimerText;
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI livesText;
+    [SerializeField] private TextMeshProUGUI countdownText;
+    [SerializeField] private TextMeshProUGUI gameTimerText;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI livesText;
 
     private int score = 0;
     private float gameTime = 0f;
@@ -77,6 +77,12 @@ public class GameManager : MonoBehaviour
             AssignUIElements();
             StartCoroutine(RoundStart());
         }
+        else if (scene.name == "Level2")
+        {
+            Debug.Log("Assigning UI elements for Level2.");
+            AssignUIElements();
+            StartCoroutine(RoundStart());
+        }
     }
 
     private void AssignUIElements()
@@ -98,35 +104,39 @@ public class GameManager : MonoBehaviour
     }
 
     private IEnumerator RoundStart()
-{
-    // Re-populate ghosts list after scene load
-    ghosts.Clear();
-    ghosts.AddRange(FindObjectsByType<GhostMovement>(FindObjectsSortMode.None));
-    Debug.Log("Number of ghosts found: " + ghosts.Count);
-
-    Debug.Log("Starting countdown...");
-    if (countdownText != null)
     {
-        countdownText.gameObject.SetActive(true);
-        countdownText.text = "3";
-        yield return new WaitForSeconds(1f);
-        countdownText.text = "2";
-        yield return new WaitForSeconds(1f);
-        countdownText.text = "1";
-        yield return new WaitForSeconds(1f);
-        countdownText.text = "GO!";
-        yield return new WaitForSeconds(1f);
-        countdownText.gameObject.SetActive(false);
-        Debug.Log("Countdown complete.");
-    }
-    else
-    {
-        Debug.LogWarning("CountdownText is null. Skipping countdown.");
-    }
+        // Re-populate ghosts list after scene load
+        ghosts.Clear();
+        ghosts.AddRange(Object.FindObjectsByType<GhostMovement>(FindObjectsSortMode.None)); // This was causing error
+        Debug.Log("Number of ghosts found: " + ghosts.Count);
 
-    gameStarted = true;
-    Debug.Log("Countdown finished, game started.");
-}
+        Debug.Log("Starting countdown...");
+        if (countdownText != null)
+        {
+            countdownText.gameObject.SetActive(true);
+            countdownText.text = "3";
+            Debug.Log("Countdown set to 3");
+            yield return new WaitForSeconds(1f);
+            countdownText.text = "2";
+            Debug.Log("Countdown set to 2");
+            yield return new WaitForSeconds(1f);
+            countdownText.text = "1";
+            Debug.Log("Countdown set to 1");
+            yield return new WaitForSeconds(1f);
+            countdownText.text = "GO!";
+            Debug.Log("Countdown set to GO!");
+            yield return new WaitForSeconds(1f);
+            countdownText.gameObject.SetActive(false);
+            Debug.Log("Countdown complete.");
+        }
+        else
+        {
+            Debug.LogWarning("CountdownText is null. Skipping countdown.");
+        }
+
+        gameStarted = true;
+        Debug.Log("Countdown finished, game started.");
+    }
 
 
     private void Update()
@@ -137,11 +147,13 @@ public class GameManager : MonoBehaviour
             if (gameTimerText != null)
             {
                 gameTimerText.text = FormatTime(gameTime);
+                Debug.Log($"Game Timer updated to: {FormatTime(gameTime)}");
             }
 
             if (isScaredState)
             {
                 scaredStateTimer -= Time.deltaTime;
+                Debug.Log($"[GameManager] Scared State Timer: {scaredStateTimer}");
                 if (scaredStateTimer <= 0f)
                 {
                     EndScaredState();
@@ -166,7 +178,9 @@ public class GameManager : MonoBehaviour
         int minutes = Mathf.FloorToInt(time / 60F);
         int seconds = Mathf.FloorToInt(time % 60F);
         int milliseconds = Mathf.FloorToInt((time * 1000F) % 1000F);
-        return string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, milliseconds);
+        string formattedTime = string.Format("{0:00}:{1:00}:{2:000}", minutes, seconds, milliseconds);
+        // Debug.Log($"Game Timer formatted: {formattedTime}");
+        return formattedTime;
     }
 
     public void AddScore(int amount)
@@ -175,15 +189,27 @@ public class GameManager : MonoBehaviour
         if (scoreText != null)
         {
             scoreText.text = "Score: " + score;
+            Debug.Log("Score updated: " + score);
         }
-        Debug.Log("Score updated: " + score);
+        else
+        {
+            Debug.LogWarning("scoreText is null. Cannot update score UI.");
+        }
     }
 
     public void StartScaredState()
     {
+        // **Prevent Multiple Scared State Calls**
+        if (isScaredState)
+        {
+            Debug.Log("Already in Scared State. Ignoring StartScaredState call.");
+            return;
+        }
+
         Debug.Log("Starting Scared State");
         isScaredState = true;
         scaredStateTimer = scaredStateDuration;
+        Debug.Log($"scaredStateTimer set to: {scaredStateTimer}");
 
         foreach (GhostMovement ghost in ghosts)
         {
@@ -193,6 +219,7 @@ public class GameManager : MonoBehaviour
         if (AudioManager.instance != null)
         {
             AudioManager.instance.PlayMusic(AudioManager.instance.scaredStateMusic);
+            Debug.Log("Scared state music played.");
         }
         else
         {
@@ -216,6 +243,7 @@ public class GameManager : MonoBehaviour
         if (AudioManager.instance != null)
         {
             AudioManager.instance.PlayMusic(AudioManager.instance.normalStateMusic);
+            Debug.Log("Normal state music played.");
         }
         else
         {

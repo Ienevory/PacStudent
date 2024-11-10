@@ -15,8 +15,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip powerPelletCollection;
     public AudioClip pacStudentMovement;
     public AudioClip pacStudentDeath;
-    // **Added cherry collection sound clip**
-    public AudioClip cherryCollection; // Add this line
+    public AudioClip cherryCollection;
 
     private AudioSource musicSource;
     private AudioSource sfxSource;
@@ -49,6 +48,10 @@ public class AudioManager : MonoBehaviour
             PlayMusic(introMusic);
         }
         else if (currentScene == "SampleScene")
+        {
+            PlayMusic(normalStateMusic);
+        }
+        else if (currentScene == "Level2")
         {
             PlayMusic(normalStateMusic);
         }
@@ -89,6 +92,5 @@ public class AudioManager : MonoBehaviour
     public void PlayPelletCollectionSFX() => PlaySFX(pelletCollection);
     public void PlayPowerPelletCollectionSFX() => PlaySFX(powerPelletCollection);
     public void PlayPacStudentDeathSFX() => PlaySFX(pacStudentDeath);
-    // **Added method to play cherry collection sound**
-    public void PlayCherryCollectionSFX() => PlaySFX(cherryCollection); // Add this line
+    public void PlayCherryCollectionSFX() => PlaySFX(cherryCollection);
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-// Move the enum outside of the class
+// This has to be outside
 public enum GhostState
 {
     Normal,
@@ -12,9 +12,9 @@ public enum GhostState
 
 public class GhostMovement : MonoBehaviour
 {
-    public float normalSpeed = 2f;    // Original speed
-    public float scaredSpeed = 1f;    // Original speed
-    public float deadSpeed = 3f;      // Original speed
+    public float normalSpeed = 2f;    
+    public float scaredSpeed = 1f;    
+    public float deadSpeed = 3f;      
     public float scaredDuration = 10f;
     private float scaredTimer;
 
@@ -28,7 +28,6 @@ public class GhostMovement : MonoBehaviour
     private Vector2 destination;
     private bool isMoving = false;
 
-    // Reference to PacStudent
     private Transform pacStudent;
 
     void Start()
@@ -36,7 +35,7 @@ public class GhostMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
-        // Find PacStudent in the scene
+        // Finds PacStudent in the scene
         GameObject pacStudentObject = GameObject.FindGameObjectWithTag("Player");
         if (pacStudentObject != null)
         {
@@ -47,14 +46,14 @@ public class GhostMovement : MonoBehaviour
             Debug.LogError("PacStudent not found in the scene!");
         }
 
-        // Start moving
+        // Starts moving
         destination = transform.position;
         ChooseNewDirection();
     }
 
     void Update()
     {
-        // Handle state timing
+        // Handles state timing
         if (currentState == GhostState.Scared)
         {
             scaredTimer -= Time.deltaTime;
@@ -94,7 +93,7 @@ public class GhostMovement : MonoBehaviour
 
     private void ChooseNewDirection()
     {
-        // Get available directions
+        // Gets available directions
         List<Vector2> availableDirections = new List<Vector2>();
 
         foreach (Vector2 dir in directions)
@@ -107,14 +106,14 @@ public class GhostMovement : MonoBehaviour
 
         if (availableDirections.Count > 0)
         {
-            // Choose a random available direction
+            // Chooses a random available direction
             Vector2 chosenDirection = availableDirections[Random.Range(0, availableDirections.Count)];
             destination = (Vector2)transform.position + chosenDirection;
             isMoving = true;
         }
         else
         {
-            // No available directions, ghost is stuck
+            // Ghost is stuck
             isMoving = false;
         }
     }
@@ -148,21 +147,23 @@ public class GhostMovement : MonoBehaviour
         {
             if (currentState == GhostState.Normal)
             {
-                // PacStudent loses a life
+                // Damage
                 GameManager.instance.PacStudentCaught();
+                Debug.Log($"{gameObject.name} collided with Player while Normal.");
             }
             else if (currentState == GhostState.Scared)
             {
                 // Ghost dies
                 SetState(GhostState.Dead);
                 GameManager.instance.AddScore(200);
+                Debug.Log($"{gameObject.name} collided with Player while Scared and is now Dead.");
             }
         }
         else if (collision.gameObject.CompareTag("Ghost"))
         {
             // Collision with another ghost
-            Debug.Log("Collision with another ghost! Changing direction.");
-            ChooseNewDirection(); // Change direction to avoid getting stuck
+            Debug.Log($"{gameObject.name} collided with another ghost! Changing direction.");
+            ChooseNewDirection(); // Changing direction to avoid getting stuck
         }
     }
 
@@ -175,16 +176,19 @@ public class GhostMovement : MonoBehaviour
             case GhostState.Normal:
                 animator.SetBool("isScared", false);
                 animator.SetBool("isDead", false);
+                Debug.Log($"{gameObject.name} set to Normal state.");
                 break;
             case GhostState.Scared:
                 animator.SetBool("isScared", true);
                 animator.SetBool("isDead", false);
                 scaredTimer = scaredDuration;
+                Debug.Log($"{gameObject.name} set to Scared state.");
                 break;
             case GhostState.Dead:
                 animator.SetBool("isScared", false);
                 animator.SetBool("isDead", true);
-                // Implement logic to return to spawn point
+                Debug.Log($"{gameObject.name} set to Dead state.");
+                // Yeah this needs further work
                 StartCoroutine(ReturnToHome());
                 break;
         }
@@ -194,6 +198,7 @@ public class GhostMovement : MonoBehaviour
     {
         // Disable collision with PacStudent while dead
         Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Player"), true);
+        Debug.Log($"{gameObject.name} is now ignoring collisions with Player.");
 
         // Move towards home position (assuming (0,0))
         while (Vector2.Distance(transform.position, Vector2.zero) > 0.1f)
@@ -208,6 +213,7 @@ public class GhostMovement : MonoBehaviour
 
         // Re-enable collision with PacStudent
         Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Player"), false);
+        Debug.Log($"{gameObject.name} is now colliding with Player again.");
 
         // Choose a new direction
         destination = transform.position;

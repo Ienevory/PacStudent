@@ -12,11 +12,11 @@ public class LevelGenerator : MonoBehaviour
     public GameObject pelletPrefab;
     public GameObject powerPelletPrefab;
     public GameObject tJunctionPrefab;
-    public List<GameObject> ghostPrefabs; // Assign four ghost prefabs in the Inspector
+    public List<GameObject> ghostPrefabs; 
 
     [Header("Level Maps")]
     [Tooltip("Define level maps for each scene by matching the scene name.")]
-    public List<LevelData> levels; // List to hold LevelData entries
+    public List<LevelData> levels = new List<LevelData>(); // Initialize the list
 
     private LevelData currentLevelData;
 
@@ -28,6 +28,15 @@ public class LevelGenerator : MonoBehaviour
 
         [Tooltip("List of rows representing the level layout.")]
         public List<LevelRow> levelMap = new List<LevelRow>();
+
+        [Tooltip("Whether the level map should be generated randomly.")]
+        public bool isRandomlyGenerated = false;
+
+        [Tooltip("Width of the map for random generation.")]
+        public int mapWidth = 10;
+
+        [Tooltip("Height of the map for random generation.")]
+        public int mapHeight = 10;
     }
 
     [System.Serializable]
@@ -44,18 +53,33 @@ public class LevelGenerator : MonoBehaviour
 
     private void GenerateLevel()
     {
-        // Determine the current scene
+        // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         string currentScene = SceneManager.GetActiveScene().name;
         Debug.Log("Current Scene: " + currentScene);
         currentLevelData = levels.Find(level => level.sceneName == currentScene);
 
         if (currentLevelData == null)
         {
-            Debug.LogError("No level map defined for scene: " + currentScene);
+            Debug.LogError("No LevelData defined for scene: " + currentScene);
             return;
         }
 
         Debug.Log("Found LevelData for scene: " + currentScene);
+
+        if (currentLevelData.isRandomlyGenerated)
+        {
+            Debug.Log("Generating Level Map Randomly for scene: " + currentScene);
+            GenerateRandomLevelMap(currentLevelData);
+        }
+        else
+        {
+            Debug.Log("Using predefined Level Map for scene: " + currentScene);
+            if (currentLevelData.levelMap == null || currentLevelData.levelMap.Count == 0)
+            {
+                Debug.LogError("LevelMap is empty for scene: " + currentScene);
+                return;
+            }
+        }
 
         List<LevelRow> levelMapToUse = currentLevelData.levelMap;
         int ghostIndex = 0; // Index to track the current ghost prefab for spawning
@@ -105,7 +129,6 @@ public class LevelGenerator : MonoBehaviour
                         break;
 
                     case 8: // Ghost Spawn Point
-                        // Spawn a ghost from the list of ghost prefabs, cycling if necessary
                         if (ghostPrefabs != null && ghostPrefabs.Count > 0)
                         {
                             Instantiate(ghostPrefabs[ghostIndex % ghostPrefabs.Count], position, Quaternion.identity);
@@ -121,6 +144,74 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void GenerateRandomLevelMap(LevelData levelData)
+    {
+        int width = levelData.mapWidth;
+        int height = levelData.mapHeight;
+        List<LevelRow> generatedMap = new List<LevelRow>();
+
+        for (int y = 0; y < height; y++)
+        {
+            LevelRow row = new LevelRow();
+            for (int x = 0; x < width; x++)
+            {
+                if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
+                {
+                    // Fixed borders: walls
+                    if ((x == 0 || x == width - 1) && (y == 0 || y == height - 1))
+                    {
+                        // Corners
+                        row.row.Add(1); // Outside Corner
+                    }
+                    else
+                    {
+                        // Walls
+                        row.row.Add(2); // Outside Wall
+                    }
+                }
+                else
+                {
+                    // Defines a wall probability, e.g., 30%
+                    int tileType = Random.value < 0.3f ? 4 : 0; // Inside Wall or Empty
+                    row.row.Add(tileType);
+                }
+            }
+            generatedMap.Add(row);
+        }
+
+        // Assign Ghost Spawn Points
+        int numberOfGhosts = Mathf.Min(ghostPrefabs.Count, 4); 
+        List<Vector2> emptyPositions = new List<Vector2>();
+        for (int y = 1; y < height - 1; y++)
+        {
+            for (int x = 1; x < width - 1; x++)
+            {
+                if (generatedMap[y].row[x] == 0)
+                {
+                    emptyPositions.Add(new Vector2(x, -y));
+                }
+            }
+        }
+
+        if (emptyPositions.Count >= numberOfGhosts)
+        {
+            for (int i = 0; i < numberOfGhosts; i++)
+            {
+                int index = Random.Range(0, emptyPositions.Count);
+                Vector2 spawnPosition = emptyPositions[index];
+                generatedMap[(int)-spawnPosition.y].row[(int)spawnPosition.x] = 8; // Ghost Spawn Point
+                emptyPositions.RemoveAt(index);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Not enough empty positions to place all ghosts.");
+        }
+
+        levelData.levelMap = generatedMap;
+        Debug.Log("Random Level Map Generated with Ghost Spawn Points.");
     }
 
     // Placeholder methods for determining rotation based on tile type and position
@@ -162,7 +253,7 @@ public class LevelGenerator : MonoBehaviour
 
     private Quaternion DetermineTJunctionRotation(int x, int y)
     {
-        return Quaternion.identity; // Customize as needed for T-junctions
+        return Quaternion.identity; 
     }
 
     private bool IsWall(int tileType)
